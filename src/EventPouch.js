@@ -1,3 +1,4 @@
+/*globals window: true, PouchDB: true*/
 'use strict';
 
 window.EventPouch = function EventPouch(connStr, tout, cb) {
@@ -25,26 +26,24 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
     // Right now just check for PouchDB
     if (!PouchDB) {
       throw new Error('Missing PouchDB');
-      return;
     }
 
     // Setup basic configuration
     if (!connStr) {
       throw new Error('Need a server to sync client data');
-      return;
     }
 
     remoteServer = connStr;
     timeout = null;
     if (typeof tout == 'number') {
-      timeout = parseInt(tout);
+      timeout = parseInt(tout, 10);
     }
 
     getConfiguration(function onConfiguration() {
       setBasicHandlers();
       startSession();
       // Launch sync
-      if (timeout != null) {
+      if (timeout !== null) {
         setTimeout(sync, timeout);
       }
     });
@@ -88,12 +87,12 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
     }
 
     // Get information from the manifest
-    if (!navigator.mozApps) {
+    if (!window.navigator.mozApps) {
       setUnknonwVersion();
       return;
     }
 
-    var request = navigator.mozApps.getSelf();
+    var request = window.navigator.mozApps.getSelf();
     request.onsuccess = function(evt) {
       var app = evt.target.result;
       if (!app || !app.manifest || !app.manifest.version) {
@@ -128,7 +127,7 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
   // library
   var setBasicHandlers = function setBasicHandlers() {
     // Listen to loggeable events
-    document.addEventListener('eventpouch', eventListener);
+    window.document.addEventListener('eventpouch', eventListener);
 
     originalOnError = window.onerror;
     originalOnBeforeUnload = window.onbeforeunload;
@@ -168,7 +167,7 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
       return Math.floor((1 + Math.random()) * 0x10000)
                  .toString(16)
                  .substring(1);
-    };
+    }
 
     return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
           s4() + '-' + s4() + s4() + s4();
@@ -197,7 +196,7 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
   };
 
   var sync = function sync(cb) {
-    if (!navigator.onLine) {
+    if (!window.navigator.onLine) {
       if (cb) {
         cb();
       }
