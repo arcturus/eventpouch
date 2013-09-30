@@ -16,7 +16,8 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
       uuid,
       version;
 
-  var eventsDB,
+  var sessionDB,
+      historyDB,
       currentSession,
       originalOnBeforeUnload,
       originalOnError;
@@ -27,6 +28,8 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
     if (!PouchDB) {
       throw new Error('Missing PouchDB');
     }
+
+    PouchDB.DEBUG = true;
 
     // Setup basic configuration
     if (!connStr) {
@@ -39,12 +42,37 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
       timeout = parseInt(tout, 10);
     }
 
-    getConfiguration(function onConfiguration() {
-      setBasicHandlers();
-      startSession();
-      // Launch sync
-      if (timeout !== null) {
-        setTimeout(sync, timeout);
+    ensureDBs();
+
+    archiveCurrentSession(function onArchive() {
+      getConfiguration(function onConfiguration() {
+        setBasicHandlers();
+        startSession();
+        // Launch sync
+        if (timeout !== null) {
+          setTimeout(sync, timeout);
+        }
+      });
+    });
+  };
+
+  // Saves the current session data into the history data
+  // emptying the current session db.
+  var archiveCurrentSession = function archiveCurrentSession(cb) {
+    if (!sessionDB || !historyDB) {
+      if (typeof cb === 'function') {
+        cb();
+      }
+      return;
+    }
+
+    sessionDB.replicate.to(historyDB, {'complete': function onComplete() {
+        // Clear current session DB
+        resetDB('session', function onReset() {
+          if (typeof cb === 'function') {
+            cb();
+          }
+        });
       }
     });
   };
@@ -141,6 +169,15 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
     };
   };
 
+  var ensureDBs = function ensureDBs() {
+    //if (sessionDB === null) {
+      sessionDB = new PouchDB('session');
+    //}
+    //if (historyDB === null) {
+      historyDB = new PouchDB('history');
+    //}
+  };
+
   var startSession = function startSession(cb) {
     currentSession = {
         'session_id': new Date(),
@@ -148,8 +185,9 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
         'version': version
     };
 
-    eventsDB = new PouchDB('events');
-    eventsDB.get(defaultEvents.register, function(err, value) {
+    ensureDBs();
+
+    historyDB.get(defaultEvents.register, function(err, value) {
       if (err || !value) {
         logEvent(defaultEvents.register, {});
       }
@@ -187,12 +225,35 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
       '_id': id
     };
 
-    eventsDB.put(loggedEvent, function(err, data) {
+    if (sessionDB === null) {
+      sessionDB = new PouchDB('session');
+    }
+
+    sessionDB.put(loggedEvent, function(err, data) {
       // Don't do anything if fail
       if (cb) {
         cb();
       }
     });
+  };
+
+  // Clears information in db, so far by destroying
+  // it :S
+  var resetDB = function resetDB(dbName, cb) {
+    PouchDB.destroy(dbName, function onDestroy(err, info) {
+      if (dbName === 'session') {
+        sessionDB._close();
+        sessionDB = null;
+      } else {
+        historyDB._close();
+        historyDB = null;
+      }
+
+      if (typeof cb === 'function') {
+        cb();
+      }
+    });
+
   };
 
   var sync = function sync(cb) {
@@ -203,15 +264,32 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
       return;
     }
 
+    if (historyDB === null) {
+      historyDB = new PouchDB('history');
+    }
+
     var onComplete = cb || null;
-    eventsDB.replicate.to(remoteServer, {
+    historyDB.replicate.to(remoteServer, {
       complete: onComplete
+    });
+  };
+
+  var clearLocalData = function clearLocalData(cb) {
+    PouchDB.destroy('config', function onConfigDone() {
+      PouchDB.destroy('session', function onSessionDone() {
+        PouchDB.destroy('history', function onHistoryDone() {
+          if (typeof cb === 'function') {
+            cb();
+          }
+        });
+      });
     });
   };
 
   init(connStr, tout, cb);
 
   return {
-    'logEvent': logEvent
+    'logEvent': logEvent,
+    'clearLocalData': clearLocalData
   };
 };
