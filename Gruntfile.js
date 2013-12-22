@@ -7,6 +7,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
+  grunt.loadNpmTasks('grunt-browserify');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -40,7 +41,7 @@ module.exports = function (grunt) {
     },
     watch: {
       files: ['<%= jshint.all %>'],
-      tasks: ['jshint']
+      tasks: ['jshint', 'mocha-chai-sinon']
     },
     connect: {
       server: {
@@ -49,8 +50,38 @@ module.exports = function (grunt) {
           base: '.'
         }
       }
+    },
+    browserify: {
+      dist: {
+        files: {
+          'build/eventpouch.js': ['src/*.js'],
+        }
+      }
+    },
+    'mocha-chai-sinon': {
+      build: {
+        src: ['./tests/**/*.js'],
+        options: {
+          ui: 'tdd',
+          reporter: 'spec'
+        }
+      },
+      coverage: {
+        src: ['./src/**/*.js'],
+        options: {
+          ui: 'tdd',
+          reporter: 'html-cov',
+          quiet: true,
+          captureFile: './build/coverage.html'
+        }
+      }
     }
   });
 
+  grunt.loadNpmTasks("grunt-mocha-chai-sinon");
+
   grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'connect']);
+  grunt.registerTask('test', [
+    'mocha-chai-sinon'
+  ]);
 };

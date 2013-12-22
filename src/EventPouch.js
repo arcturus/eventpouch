@@ -1,7 +1,9 @@
 /*globals window: true, PouchDB: true*/
 'use strict';
 
-window.EventPouch = function EventPouch(connStr, tout, cb) {
+var getUUID = require('./utils/uuid.js');
+
+var EventPouch = function EventPouch(connStr, tout, cb) {
 
   var defaultEvents = {
     'register': 'register',
@@ -199,18 +201,6 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
     });
   };
 
-  // Utility function to get unique ids per client
-  var getUUID = function getUUID() {
-    function s4() {
-      return Math.floor((1 + Math.random()) * 0x10000)
-                 .toString(16)
-                 .substring(1);
-    }
-
-    return s4() + s4() + '-' + s4() + '-' + s4() + '-' +
-          s4() + '-' + s4() + s4() + s4();
-  };
-
   // Saves an event of type (a string) with the json data
   // given by the payLoad parameter.
   var logEvent = function logEvent(type, payLoad, cb) {
@@ -293,3 +283,5 @@ window.EventPouch = function EventPouch(connStr, tout, cb) {
     'clearLocalData': clearLocalData
   };
 };
+
+module.exports = EventPouch;
