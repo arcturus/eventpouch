@@ -24,6 +24,7 @@ var eventpouch_env = function() {
   var getAppVersion = function getAppVersion(cb) {
     if (version) {
       cb(version);
+      return;
     }
     switch(detectEnv()) {
       case 'mozApps':
@@ -60,8 +61,13 @@ var eventpouch_env = function() {
     cb(version);
   };
 
+  var reset = function reset() {
+    version = null;
+  };
+
   return {
-    'getAppVersion': getAppVersion
+    'getAppVersion': getAppVersion,
+    'reset': reset
   };
 
 }();
