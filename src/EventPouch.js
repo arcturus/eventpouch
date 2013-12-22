@@ -26,11 +26,6 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
       originalOnError;
 
   var init = function init(connStr, tout, cb) {
-    // Check that we have our dependencies loaded
-    // Right now just check for PouchDB
-    if (!PouchDB) {
-      throw new Error('Missing PouchDB');
-    }
 
     PouchDB.DEBUG = true;
 
