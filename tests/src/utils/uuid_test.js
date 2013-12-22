@@ -1,6 +1,7 @@
+/*global suite,test,assert*/
 'use strict';
 
-var uuidGenerator = require('../../src/utils/uuid.js');
+var uuidGenerator = require('../../../src/utils/uuid.js');
 
 suite('UUID Generator', function() {
 

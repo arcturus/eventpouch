@@ -2,6 +2,7 @@
 'use strict';
 
 var getUUID = require('./utils/uuid.js');
+var evenpouch_env = require('./eventpouch_env.js');
 var PouchDB = require('pouchdb');
 
 var EventPouch = function EventPouch(connStr, tout, cb) {
@@ -87,7 +88,7 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
       if (err || !config) {
         config = {};
         uuid = config.uuid = getUUID();
-        getAppVersion(function onVersion(v) {
+        evenpouch_env.getAppVersion(function onVersion(v) {
           version = config.version = v;
           config._id = 'master_params';
 
@@ -102,35 +103,6 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
         cb();
       }
     });
-  };
-
-  // Gets app version from manifest if present
-  // string 'unknown' otherwise
-  var getAppVersion = function getAppVersion(cb) {
-    // Helper function
-    function setUnknonwVersion() {
-      cb('unknown');
-    }
-
-    // Get information from the manifest
-    if (!window.navigator.mozApps) {
-      setUnknonwVersion();
-      return;
-    }
-
-    var request = window.navigator.mozApps.getSelf();
-    request.onsuccess = function(evt) {
-      var app = evt.target.result;
-      if (!app || !app.manifest || !app.manifest.version) {
-        setUnknonwVersion();
-        return;
-      }
-
-      cb(app.manifest.version);
-    };
-    request.onerror = function(evt) {
-      setUnknonwVersion();
-    };
   };
 
   // Handles custom dom events launched under the
