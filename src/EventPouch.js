@@ -2,6 +2,7 @@
 'use strict';
 
 var getUUID = require('./utils/uuid.js');
+var PouchDB = require('pouchdb');
 
 var EventPouch = function EventPouch(connStr, tout, cb) {
 

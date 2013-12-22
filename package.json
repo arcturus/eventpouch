@@ -2,7 +2,7 @@
   "name": "eventpouch",
   "version": "0.0.1",
   "dependencies": {
-    "pouchdb": "0.0.14"
+    "pouchdb": "1.0.0"
   },
   "devDependencies": {
     "grunt": "~0.4.2",

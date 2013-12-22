@@ -41,7 +41,7 @@ module.exports = function (grunt) {
     },
     watch: {
       files: ['<%= jshint.all %>'],
-      tasks: ['jshint', 'mocha-chai-sinon']
+      tasks: ['jshint', 'mocha-chai-sinon', 'browserify']
     },
     connect: {
       server: {
