@@ -57,6 +57,9 @@ module.exports = function (grunt) {
         files: {
           'build/eventpouch.js': ['src/*.js'],
         }
+      },
+      options: {
+        alias: ['./src/eventpouch.js:eventpouch']
       }
     },
     'mocha-chai-sinon': {
