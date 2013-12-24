@@ -2,8 +2,7 @@
 'use strict';
 
 var getUUID = require('./utils/uuid.js');
-var evenpouch_env = require('./eventpouch_env.js');
-var PouchDB = require('pouchdb');
+var Configurator = require('./eventpouch_config.js');
 
 var EventPouch = function EventPouch(connStr, tout, cb) {
 
@@ -44,7 +43,8 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
     ensureDBs();
 
     archiveCurrentSession(function onArchive() {
-      getConfiguration(function onConfiguration() {
+      var config = new Configurator();
+      config.loadConfiguration(function onConfiguration() {
         setBasicHandlers();
         startSession();
         // Launch sync
@@ -72,35 +72,6 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
             cb();
           }
         });
-      }
-    });
-  };
-
-  // Gets some of the configuration needed that was stored
-  // locally, if doesnt exists, creates basic info.
-  // We will store locally the following parameters:
-  //    - App version, if present in the manifest (or unknonw)
-  //    - UUID for an specific client
-  var getConfiguration = function getConfiguration(cb) {
-    var configDB = new PouchDB('config');
-
-    configDB.get('master_params', function(err, config) {
-      if (err || !config) {
-        config = {};
-        uuid = config.uuid = getUUID();
-        evenpouch_env.getAppVersion(function onVersion(v) {
-          version = config.version = v;
-          config._id = 'master_params';
-
-          // Save the result for next session
-          configDB.put(config, function(err, response) {
-            cb();
-          });
-        });
-      } else {
-        uuid = config.uuid;
-        version = config.version;
-        cb();
       }
     });
   };
