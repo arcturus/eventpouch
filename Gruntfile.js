@@ -46,11 +46,11 @@ module.exports = function (grunt) {
     browserify: {
       dist: {
         files: {
-          'dist/eventpouch.js': ['src/*.js'],
+          'dist/eventpouch.js': ['src/*.js']
         }
       },
       options: {
-        alias: ['./src/eventpouch.js:eventpouch'],
+        alias: ['./src/eventpouch.js:eventpouch', './src/eventpouch_config.js:eventpouch_config'],
         debug: true
       }
     },
