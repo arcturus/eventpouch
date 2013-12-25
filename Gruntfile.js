@@ -5,28 +5,18 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-jshint');
   grunt.loadNpmTasks('grunt-contrib-uglify');
   grunt.loadNpmTasks('grunt-contrib-watch');
-  grunt.loadNpmTasks('grunt-contrib-concat');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-browserify');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
-    concat: {
-      options: {
-        separator: ';'
-      },
-      dist: {
-        src: ['src/*.js'],
-        dest: 'dist/<%= pkg.name %>-<%= pkg.version %>.js'
-      }
-    },
     uglify: {
       options: {
-        banner: '/*! <%= pkg.name %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
+        banner: '/*! <%= pkg.name %> <%= pkg.version %> <%= grunt.template.today("dd-mm-yyyy") %> */\n'
       },
       dist: {
         files: {
-          'dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['<%= concat.dist.dest %>']
+          'dist/<%= pkg.name %>-<%= pkg.version %>.min.js': ['dist/eventpouch.js']
         }
       }
     },
@@ -37,7 +27,8 @@ module.exports = function (grunt) {
       all: [
         'Gruntfile.js',
         'src/**/*.js',
-        'tests/src/**/*.js'
+        'tests/src/**/*.js',
+        'package.json'
       ]
     },
     watch: {
@@ -55,7 +46,7 @@ module.exports = function (grunt) {
     browserify: {
       dist: {
         files: {
-          'build/eventpouch.js': ['src/*.js'],
+          'dist/eventpouch.js': ['src/*.js'],
         }
       },
       options: {
@@ -85,7 +76,7 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks("grunt-mocha-chai-sinon");
 
-  grunt.registerTask('default', ['jshint', 'concat', 'uglify', 'connect']);
+  grunt.registerTask('default', ['jshint', 'browserify', 'uglify', 'connect']);
   grunt.registerTask('test', [
     'mocha-chai-sinon'
   ]);
