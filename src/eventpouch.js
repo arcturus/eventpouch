@@ -1,10 +1,9 @@
 /*globals window: true, PouchDB: true*/
 'use strict';
 
-var getUUID = require('./utils/uuid.js');
 var Configurator = require('./eventpouch_config.js');
 
-var EventPouch = function EventPouch(connStr, tout, cb) {
+var EventPouch = function EventPouch(configObj, cb) {
 
   var defaultEvents = {
     'register': 'register',
@@ -13,11 +12,7 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
     'error': 'error'
   };
 
-  // Configuration values
-  var remoteServer,
-      timeout,
-      uuid,
-      version;
+  var config;
 
   var sessionDB,
       historyDB,
@@ -25,30 +20,24 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
       originalOnBeforeUnload,
       originalOnError;
 
-  var init = function init(connStr, tout, cb) {
+  var init = function init(configObj, cb) {
 
     PouchDB.DEBUG = true;
-
-    // Setup basic configuration
-    if (!connStr) {
-      throw new Error('Need a server to sync client data');
-    }
-
-    remoteServer = connStr;
-    timeout = null;
-    if (typeof tout == 'number') {
-      timeout = parseInt(tout, 10);
-    }
 
     ensureDBs();
 
     archiveCurrentSession(function onArchive() {
-      new Configurator(function onConfig(config) {
+      new Configurator(configObj, function onConfig(cfg) {
+        config = cfg;
         setBasicHandlers();
         startSession();
         // Launch sync
         if (config.remoteSyncHost) {
-          setTimeout(sync, config.syncAfter * 1000); // Minutes
+          setTimeout(remoteSync, config.syncAfter * 1000); // Minutes
+        }
+
+        if (typeof cb === 'function') {
+          cb();
         }
       });
     });
@@ -110,19 +99,19 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
   };
 
   var ensureDBs = function ensureDBs() {
-    //if (sessionDB === null) {
-      sessionDB = new PouchDB('session');
-    //}
-    //if (historyDB === null) {
-      historyDB = new PouchDB('history');
-    //}
+    sessionDB = new PouchDB('session');
+    historyDB = new PouchDB('history');
   };
 
+  // Start to record a new session, each time we lauch,
+  // event pouch from a cold start.
+  // That session will be used in all events logged,
+  // until a new session is created.
   var startSession = function startSession(cb) {
     currentSession = {
         'session_id': new Date(),
-        'uuid': uuid,
-        'version': version
+        'uuid': config.uuid,
+        'version': config.version
     };
 
     ensureDBs();
@@ -153,10 +142,6 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
       '_id': id
     };
 
-    if (sessionDB === null) {
-      sessionDB = new PouchDB('session');
-    }
-
     sessionDB.put(loggedEvent, function(err, data) {
       // Don't do anything if fail
       if (cb) {
@@ -184,7 +169,10 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
 
   };
 
-  var sync = function sync(cb) {
+  // Copy current content of history db to
+  // a remote CouchDB previously configured
+  var remoteSync = function remoteSync(cb) {
+    // TODO: Register for online events to retry.
     if (!window.navigator.onLine) {
       if (cb) {
         cb();
@@ -192,12 +180,8 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
       return;
     }
 
-    if (historyDB === null) {
-      historyDB = new PouchDB('history');
-    }
-
     var onComplete = cb || null;
-    historyDB.replicate.to(remoteServer, {
+    historyDB.replicate.to(config.remoteSyncHost, {
       complete: onComplete
     });
   };
@@ -214,7 +198,7 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
     });
   };
 
-  init(connStr, tout, cb);
+  init(configObj, cb);
 
   return {
     'logEvent': logEvent,
