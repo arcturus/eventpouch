@@ -28,6 +28,7 @@ module.exports = function (grunt) {
         'Gruntfile.js',
         'src/**/*.js',
         'tests/src/**/*.js',
+        'tests/mocks/**/*.js',
         'package.json'
       ]
     },
@@ -50,7 +51,7 @@ module.exports = function (grunt) {
         }
       },
       options: {
-        alias: ['./src/eventpouch.js:eventpouch', './src/eventpouch_config.js:eventpouch_config'],
+        alias: ['./src/eventpouch.js:eventpouch']
         debug: true
       }
     },

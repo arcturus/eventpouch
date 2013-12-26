@@ -35,7 +35,7 @@ suite('environment detection', function() {
           'mozApps': MockMozApps
         };
         subject = global.window.navigator.mozApps;
-        
+
         globalWindow = true;
       } else {
         realMozApps = window.navigator.mozApps;
@@ -46,7 +46,7 @@ suite('environment detection', function() {
       subject.selfManifest = {
         'version': '0.0.1'
       };
-      
+
     });
 
     suiteTeardown(function() {

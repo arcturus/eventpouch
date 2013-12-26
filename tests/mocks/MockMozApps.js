@@ -1,3 +1,4 @@
+/*jslint -W078 */
 'use strict';
 
 var MockMozApps = function MockMozApps() {
@@ -13,11 +14,11 @@ var MockMozApps = function MockMozApps() {
                 manifest: selfManifest
               }
             }
-          }
+          };
           cb(evt);
         }, 0);
       }
-    }
+    };
   };
 
   return {
@@ -28,7 +29,7 @@ var MockMozApps = function MockMozApps() {
       selfManifest = m;
     },
     'getSelf': getSelf
-  }
+  };
 }();
 
 module.exports = MockMozApps;

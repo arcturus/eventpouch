@@ -43,13 +43,12 @@ var EventPouch = function EventPouch(connStr, tout, cb) {
     ensureDBs();
 
     archiveCurrentSession(function onArchive() {
-      var config = new Configurator();
-      config.loadConfiguration(function onConfiguration() {
+      new Configurator(function onConfig(config) {
         setBasicHandlers();
         startSession();
         // Launch sync
-        if (timeout !== null) {
-          setTimeout(sync, timeout);
+        if (config.remoteSyncHost) {
+          setTimeout(sync, config.syncAfter * 1000); // Minutes
         }
       });
     });
