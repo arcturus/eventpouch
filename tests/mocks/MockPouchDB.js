@@ -9,7 +9,7 @@ var MockPouchDB = {
       return;
     }
 
-    cb(null, MockPouchDB.storage[key]);
+    cb(null, MockPouchDB.storage[MockPouchDB.db][key]);
   },
   'put': function(obj, cb) {
     if (!obj._id) {
@@ -17,13 +17,16 @@ var MockPouchDB = {
       return;
     }
 
-    MockPouchDB.storage[obj._id] = obj;
+    MockPouchDB.storage[MockPouchDB.db][obj._id] = obj;
     cb(null, obj);
   }
 };
 
 function PouchDB(name) {
   MockPouchDB.db = name;
+  if (!MockPouchDB.storage[name]) {
+    MockPouchDB.storage[name] = {};
+  }
 
   return MockPouchDB;
 }

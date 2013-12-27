@@ -40,7 +40,7 @@ suite('eventpouch config', function() {
       assert.isTrue(config.uuid.length == (32 + 4));
 
       assert.equal(mockConf.db, 'configuration');
-      assert.equal(config, mockConf.storage.configuration);
+      assert.equal(config, mockConf.storage.configuration.configuration);
 
       done();
     });

@@ -2,6 +2,7 @@
 'use strict';
 
 var Configurator = require('./eventpouch_config.js');
+var PouchDB = require('pouchdb');
 
 var EventPouch = function EventPouch(configObj, cb) {
 
