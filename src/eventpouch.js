@@ -4,7 +4,7 @@
 var Configurator = require('./eventpouch_config.js');
 var PouchDB = require('pouchdb');
 
-var EventPouch = function EventPouch(configObj, cb) {
+var EventPouch = function EventPouch(configObj, cb, onSync) {
 
   var defaultEvents = {
     'register': 'register',
@@ -21,7 +21,7 @@ var EventPouch = function EventPouch(configObj, cb) {
       originalOnBeforeUnload,
       originalOnError;
 
-  var init = function init(configObj, cb) {
+  var init = function init(configObj, cb, onSync) {
 
     PouchDB.DEBUG = true;
 
@@ -34,7 +34,11 @@ var EventPouch = function EventPouch(configObj, cb) {
         startSession();
         // Launch sync
         if (config.remoteSyncHost) {
-          setTimeout(remoteSync, config.syncAfter * 1000); // Minutes
+          setTimeout(function() {
+            remoteSync(onSync);
+          }, config.syncAfter * 1000); // Minutes
+        } else {
+
         }
 
         if (typeof cb === 'function') {
@@ -90,8 +94,12 @@ var EventPouch = function EventPouch(configObj, cb) {
     originalOnError = window.onerror;
     originalOnBeforeUnload = window.onbeforeunload;
 
-    window.onerror = function onError() {
-      logEvent(defaultEvents.error, {}, originalOnError);
+    window.onerror = function onError(errorMsg, url, lineNumber) {
+      logEvent(defaultEvents.error, {
+        'errorMsg': errorMsg,
+        'url': url,
+        'lineNumber': lineNumber
+      }, originalOnError);
     };
 
     window.onbeforeunload = function onClose() {
@@ -199,7 +207,7 @@ var EventPouch = function EventPouch(configObj, cb) {
     });
   };
 
-  init(configObj, cb);
+  init(configObj, cb, onSync);
 
   return {
     'logEvent': logEvent,

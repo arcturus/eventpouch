@@ -1,9 +1,8 @@
-/*global suite, assert, test, suiteSetup, suiteTeardown, window, setup*/
+/*global suite, assert, test, suiteSetup, suiteTeardown, window, setup, teardown*/
 'use strict';
 
 var proxyquire =  require('proxyquire');
 var MockPouchDB = require('../mocks/MockPouchDB.js');
-//var Configurator = require('../../src/eventpouch_config.js');
 var Configurator = proxyquire('../../src/eventpouch_config.js', {
   'pouchdb': MockPouchDB
 });
@@ -16,15 +15,17 @@ suite('eventpouch config', function() {
 
   suiteSetup(function() {
     mockConf = new MockPouchDB('');
-    getSpy = sinon.spy(mockConf, 'get');
-    putSpy = sinon.spy(mockConf, 'put');
+    getSpy = sinon.spy(mockConf.MockPouchDB, 'get');
+    putSpy = sinon.spy(mockConf.MockPouchDB, 'put');
   });
 
   setup(function() {
-    mockConf.storage = {};
-    mockConf.db = '';
     getSpy.reset();
     putSpy.reset();
+  });
+
+  teardown(function() {
+    mockConf.MockPouchDB.storage = {};
   });
 
   test('Simple config', function(done) {
@@ -39,8 +40,7 @@ suite('eventpouch config', function() {
       assert.equal('unknown', config.appVersion);
       assert.isTrue(config.uuid.length == (32 + 4));
 
-      assert.equal(mockConf.db, 'configuration');
-      assert.equal(config, mockConf.storage.configuration.configuration);
+      assert.equal(config, mockConf.MockPouchDB.storage.configuration.configuration);
 
       done();
     });
@@ -54,6 +54,7 @@ suite('eventpouch config', function() {
       new Configurator(cfg1, function(cfg2) {
         assert.deepEqual(cfg1, cfg2);
         assert.equal(cfg2.appVersion, '1.0.0');
+        mockConf.MockPouchDB.storage = {};
         done();
       });
     });
