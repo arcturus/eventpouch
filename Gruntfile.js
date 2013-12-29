@@ -77,8 +77,9 @@ module.exports = function (grunt) {
 
   grunt.loadNpmTasks("grunt-mocha-chai-sinon");
 
-  grunt.registerTask('default', ['jshint', 'browserify', 'uglify', 'connect']);
+  grunt.registerTask('default', ['jshint', 'test', 'browserify', 'uglify']);
   grunt.registerTask('test', [
     'mocha-chai-sinon'
   ]);
+  grunt.registerTask('serve', ['connect', 'watch']);
 };
