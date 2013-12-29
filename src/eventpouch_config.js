@@ -16,11 +16,10 @@ var Configurator = function Configurator(configObj, cb) {
     '_id': 'configuration'
   };
   var config = {};
-  if (configObj) {
-    Object.keys(DEFAULTS).forEach(function onParam(param) {
-      config[param] = configObj[param] || DEFAULTS[param];
-    });
-  }
+  configObj = configObj || {};
+  Object.keys(DEFAULTS).forEach(function onParam(param) {
+    config[param] = configObj[param] || DEFAULTS[param];
+  });
 
   var configDB = null;
 
