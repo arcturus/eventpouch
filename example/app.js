@@ -8,7 +8,9 @@ var app = function app() {
 
   var init = function init() {
     // New logger with no external sync
-    eventLogger = new eventpouch(null);
+    eventLogger = new eventpouch(null, function() {
+      dumpContent();
+    });
     var buttons = Array.prototype.slice.call(document.getElementsByTagName('button'));
     buttons.forEach(function onBtn(button) {
       button.addEventListener('click', handleEvent);
@@ -28,8 +30,13 @@ var app = function app() {
         console.log(x.parent.classList);
       break;
       case 'dumpContent':
+        dumpContent();
       break;
     }
+  };
+
+  var dumpContent = function dumpContent() {
+    console.log('Dumping content');
   };
 
   return {

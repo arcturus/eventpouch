@@ -124,4 +124,19 @@ suite('eventpouch', function() {
       }
     );
   });
+
+  test('dump', function(done) {
+    subject.dump(function(err, data) {
+      // Just having data for session, since we didn't go throught the config
+      // and didn't perform any sync, we will have data just for 'session'
+      assert.lengthOf(Object.keys(data), 3);
+      assert.isNotNull(data.session);
+      assert.isNotNull(data.history);
+      assert.isNotNull(data.configuration);
+      assert.lengthOf(data.history, 0);
+      assert.lengthOf(data.configuration, 0);
+      assert.lengthOf(data.session, 2); // register and session start
+      done();
+    });
+  });
 });

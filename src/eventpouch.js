@@ -1,4 +1,4 @@
-/*globals window: true, PouchDB: true*/
+/*globals window: true, PouchDB: true, emit*/
 'use strict';
 
 var Configurator = require('./eventpouch_config.js');
@@ -194,6 +194,7 @@ var EventPouch = function EventPouch(configObj, cb, onSync) {
   };
 
   var clearLocalData = function clearLocalData(cb) {
+    // TODO: Move this to promises
     PouchDB.destroy('config', function onConfigDone() {
       PouchDB.destroy('session', function onSessionDone() {
         PouchDB.destroy('history', function onHistoryDone() {
@@ -205,11 +206,68 @@ var EventPouch = function EventPouch(configObj, cb, onSync) {
     });
   };
 
+  // Gets a simple dump of the local data stored on
+  // PouchDB.
+  // The result object will contain the three databases
+  // used internally 'configuration', 'session' and 'history'
+  var dump = function dump(cb) {
+    // TODO: Move this to promises
+    function mapConfiguration(doc) {
+      if (doc.uuid) {
+        emit('configuration', {
+          appVersion: doc.appVersion,
+          uuid: doc.uuid,
+          remoteSyncHost: doc.remoteSyncHost,
+          syncAfter: doc.syncAfter
+        });
+      }
+    }
+
+    function mapEventPouch(doc) {
+      if (doc.type) {
+        emit(doc._id, {
+          type: doc.type,
+          date: doc.date,
+          payLoad: doc.payLoad,
+          session: doc.session
+        });
+      }
+    }
+
+    var result = {};
+    var cfgDB = new PouchDB('configuration');
+    cfgDB.query({map: mapConfiguration}, {reduce: false}, function(err, response1) {
+      if (err) {
+        cb(err);
+        return;
+      }
+      result.configuration = response1.rows;
+      var ssnDB = new PouchDB('session');
+      ssnDB.query({map: mapEventPouch}, {reduce: false}, function(err, response2) {
+        if (err) {
+          cb(err);
+          return;
+        }
+        result.session = response2.rows;
+        var histDB = new PouchDB('history');
+        histDB.query({map: mapEventPouch}, {reduce: false}, function(err, response3) {
+          if (err) {
+            cb(err);
+            return;
+          }
+          result.history = response3.rows;
+          cb(null, result);
+        });
+      });
+    });
+  };
+
   init(configObj, cb, onSync);
 
   return {
     'logEvent': logEvent,
-    'clearLocalData': clearLocalData
+    'clearLocalData': clearLocalData,
+    'dump': dump
   };
 };
 

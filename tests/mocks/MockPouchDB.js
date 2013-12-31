@@ -67,6 +67,35 @@ function PouchDB(name) {
       delete MockPouchDB.storage[name];
       setTimeout(cb, 0);
     },
+    'query': function(mapObj, options, cb) {
+      var func = mapObj.map;
+      global.currentId = '';
+      var results = {
+        'rows': []
+      };
+      function emit(key, object) {
+        results.rows.push({
+          'id': global.currentId,
+          'key': key,
+          'value': object
+        });
+      }
+      global.emit = emit;
+      var elements = MockPouchDB.storage[this.name];
+      var self = this;
+      Object.keys(elements).forEach(function onElement(key) {
+        var elem = elements[key];
+        global.currentId = elem._id;
+        func.call(null, elem);
+      });
+
+      delete global.emit;
+      delete global.currentId;
+      setTimeout(function() {
+        cb(null, results);
+      }, 0);
+
+    },
     'MockPouchDB': MockPouchDB
   };
 }
