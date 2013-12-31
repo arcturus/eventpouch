@@ -47,7 +47,7 @@ This will create the following file:
 ```
 ready to be used in your projects.
 
-Example
+Using eventpouch
 ---
 **Without external sync**
 ```javascript
@@ -79,6 +79,14 @@ var logger = new eventpouch({
 });
 ```
 When syncing remotely, CouchDB must be configured to accept [CORS request], a good practice here is to setup an unique allowed origin, your web app origin.
+
+Example
+---
+You can find a simple webapp example on the code (folder `example`), just run
+```sh
+grunt open-example
+```
+This example will allow you to generate events to be logged and dump the content of the local databases to check what's saved.
 
 Build status
 ----

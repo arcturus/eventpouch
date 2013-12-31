@@ -97,7 +97,7 @@ module.exports = function (grunt) {
     'mocha-chai-sinon'
   ]);
   grunt.registerTask('serve', ['connect', 'watch']);
-  grunt.registerTask('open-example', ['connect', 'open:firefox', 'watch']);
-  grunt.registerTask('open-example-chrome', ['connect', 'open:chrome', 'watch']);
-  grunt.registerTask('open-example-safari', ['connect', 'open:safari', 'watch']);
+  grunt.registerTask('open-example', ['default', 'connect', 'open:firefox', 'watch']);
+  grunt.registerTask('open-example-chrome', ['default', 'connect', 'open:chrome', 'watch']);
+  grunt.registerTask('open-example-safari', ['default', 'connect', 'open:safari', 'watch']);
 };
