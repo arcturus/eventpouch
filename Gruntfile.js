@@ -7,6 +7,7 @@ module.exports = function (grunt) {
   grunt.loadNpmTasks('grunt-contrib-watch');
   grunt.loadNpmTasks('grunt-contrib-connect');
   grunt.loadNpmTasks('grunt-browserify');
+  grunt.loadNpmTasks('grunt-open');
 
   grunt.initConfig({
     pkg: grunt.file.readJSON('package.json'),
@@ -72,6 +73,20 @@ module.exports = function (grunt) {
           captureFile: './build/coverage.html'
         }
       }
+    },
+    open: {
+      chrome: {
+        path: 'http://127.0.0.1:<%= connect.server.options.port %>/example/',
+        app: 'Google Chrome'
+      },
+      firefox: {
+        path: 'http://127.0.0.1:<%= connect.server.options.port %>/example/',
+        app: 'Firefox'
+      },
+      safari: {
+        path: 'http://127.0.0.1:<%= connect.server.options.port %>/example/',
+        app: 'Safari'
+      }
     }
   });
 
@@ -82,4 +97,7 @@ module.exports = function (grunt) {
     'mocha-chai-sinon'
   ]);
   grunt.registerTask('serve', ['connect', 'watch']);
+  grunt.registerTask('open-example', ['connect', 'open:firefox', 'watch']);
+  grunt.registerTask('open-example-chrome', ['connect', 'open:chrome', 'watch']);
+  grunt.registerTask('open-example-safari', ['connect', 'open:safari', 'watch']);
 };
