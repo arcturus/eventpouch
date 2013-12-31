@@ -36,7 +36,7 @@ var EventPouch = function EventPouch(configObj, cb, onSync) {
         if (config.remoteSyncHost) {
           setTimeout(function() {
             remoteSync(onSync);
-          }, config.syncAfter * 1000); // Minutes
+          }, config.syncAfter * 1000); // Seconds
         }
 
         if (typeof cb === 'function') {
