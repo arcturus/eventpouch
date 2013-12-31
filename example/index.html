@@ -3,6 +3,14 @@
     <head>
         <meta charset="utf-8">
         <title>Hello eventpouch</title>
+        <style>
+        pre {outline: 1px solid #ccc; padding: 5px; margin: 5px; }
+        .string { color: green; }
+        .number { color: darkorange; }
+        .boolean { color: blue; }
+        .null { color: magenta; }
+        .key { color: red; }
+        </style>
     </head>
     <body>
         <section>
@@ -19,8 +27,10 @@
             </article>
             <article>
                 <section><h3>Local content</h3></section>
-                <section id="dump"></section>
-            <article>
+                <section>
+                    <pre id="dump"></pre>
+                </section>
+            </article>
         </section>
     </body>
     <script defer src="../dist/eventpouch.js"></script>
