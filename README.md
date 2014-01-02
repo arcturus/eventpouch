@@ -1,7 +1,7 @@
 eventpouch
 ==========
 
-Simple instrumentation tool for HTML5 web apps.
+Simple analytics tool for HTML5 web apps.
 
 With the onmipresent idea of _offline first_, eventpouch is a javascript library that will help developers to know how their app is behaving, by keeping track of how the app is used and possible javascript errors.
 
@@ -91,6 +91,7 @@ This example will allow you to generate events to be logged and dump the content
 Build status
 ----
 [![Status](https://secure.travis-ci.org/arcturus/eventpouch.png?branch=master)](http://travis-ci.org/arcturus/eventpouch)
+[![Analytics](https://ga-beacon.appspot.com/UA-46811092-1/eventpouch/index.html)](https://github.com/arcturus/eventpouch)
 
 TODO
 ----
