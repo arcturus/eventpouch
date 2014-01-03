@@ -42,10 +42,17 @@ var Configurator = function Configurator(configObj, cb) {
           saveConfig(cb);
         }
       } else {
+        var needUpdate = false;
         Object.keys(cfg).forEach(function onKey(k) {
+          if (config[k] !== undefined) {
+            return;
+          }
           config[k] = cfg[k];
+          needUpdate = true;
         });
-        if (typeof cb === 'function') {
+        if (needUpdate) {
+          saveConfig(cb);
+        } else {
           cb(config);
         }
       }
@@ -60,10 +67,7 @@ var Configurator = function Configurator(configObj, cb) {
   }
 
   // Load the config params from DB
-  loadConfiguration(function onConfig(cfg) {
-    cfg.remoteSyncEnabled = config.remoteSyncEnabled === null;
-    cb(cfg);
-  });
+  loadConfiguration(cb);
 
 };
 
