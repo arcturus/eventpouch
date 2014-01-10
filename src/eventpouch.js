@@ -179,8 +179,8 @@ var EventPouch = function EventPouch(configObj, cb, onSync) {
   // Copy current content of history db to
   // a remote CouchDB previously configured
   var remoteSync = function remoteSync(cb) {
-    // TODO: Register for online events to retry.
     if (!window.navigator.onLine) {
+      onConnectivitySync(cb);
       if (cb) {
         cb();
       }
@@ -190,6 +190,16 @@ var EventPouch = function EventPouch(configObj, cb, onSync) {
     var onComplete = cb || null;
     historyDB.replicate.to(config.remoteSyncHost, {
       complete: onComplete
+    });
+  };
+
+  // Called when we don't have connectivity, will register
+  // for connectivity change events and will try to sync once
+  // this happens.
+  var onConnectivitySync = function onConnectivitySync() {
+    window.addEventListener('online', function onOnline(evt) {
+      window.removeEventListener('online', onOnline);
+      remoteSync();
     });
   };
 

@@ -139,4 +139,24 @@ suite('eventpouch', function() {
       done();
     });
   });
+
+  test('sync after recover connectivity', function(done) {
+    var realOnline = window.navigator.onLine;
+    window.navigator.onLine = false;
+    var evtp = new eventpouch({'remoteSyncHost': 'remoteDB',
+      'syncAfter': 0.0000001}, null, function() {
+        window.navigator.onLine = true;
+
+        var e = doc.createEvent('Events');
+        e.initEvent('online', false, true);
+        window.dispatchEvent(e);
+
+        setTimeout(function onCheck() {
+          window.navigator.onLine = realOnline;
+          assert.deepEqual(mockStorage.history, mockStorage.remoteDB);
+          done();
+        }, 0);
+      }
+    );
+  });
 });
