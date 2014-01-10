@@ -91,7 +91,6 @@ This example will allow you to generate events to be logged and dump the content
 Build status
 ----
 [![Status](https://secure.travis-ci.org/arcturus/eventpouch.png?branch=master)](http://travis-ci.org/arcturus/eventpouch)
-[![Analytics](https://ga-beacon.appspot.com/UA-46811092-1/eventpouch/index.html)](https://github.com/arcturus/eventpouch)
 
 TODO
 ----
