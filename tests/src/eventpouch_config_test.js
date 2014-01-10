@@ -33,7 +33,7 @@ suite('eventpouch config', function() {
       assert.isTrue(getSpy.called);
       assert.isTrue(putSpy.called);
 
-      assert.isFalse(config.remoteSyncEnabled);
+      assert.isNull(config.remoteSyncHost);
       assert.equal('10', config.syncAfter);
       assert.equal('configuration', config.db);
       assert.equal('configuration', config.dbConfigKey);
@@ -46,7 +46,7 @@ suite('eventpouch config', function() {
     });
   });
 
-  test('Confing already on db', function(done) {
+  test('Config already on db', function(done) {
     new Configurator({'appVersion': '1.0.0'}, function(cfg1) {
       assert.isTrue(getSpy.called);
       assert.isTrue(putSpy.called);
