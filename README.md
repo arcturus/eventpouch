@@ -107,3 +107,7 @@ Apache 2.0 (see LICENSE)
 [CouchDB]:http://couchdb.apache.org/
 [cors request]:http://wiki.apache.org/couchdb/CORS
 
+
+
+[![Bitdeli Badge](https://d2weczhvl823v0.cloudfront.net/arcturus/eventpouch/trend.png)](https://bitdeli.com/free "Bitdeli Badge")
+
